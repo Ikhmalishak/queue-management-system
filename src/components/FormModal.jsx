@@ -24,18 +24,19 @@ const FormModal = ({ show, onClose, onSave, title, fields, initialData = {} }) =
       </Modal.Header>
       <Modal.Body>
         <Form>
-          {fields.map((field) => (
-            <Form.Group key={field.name} className="mb-3">
-              <Form.Label>{field.label}</Form.Label>
-              <Form.Control
-                type={field.type || "text"}
-                name={field.name}
-                defaultValue={formData[field.name]}
-                onChange={handleChange}
-                required={field.required}
-              />
-            </Form.Group>
-          ))}
+        {fields.map((field, index) => (
+    <Form.Group key={field.name || `field-${index}`} className="mb-3">
+        <Form.Label>{field.label}</Form.Label>
+        <Form.Control
+            type={field.type || "text"}
+            name={field.name}
+            defaultValue={formData[field.name]}
+            onChange={handleChange}
+            required={field.required}
+        />
+    </Form.Group>
+))}
+
         </Form>
       </Modal.Body>
       <Modal.Footer>

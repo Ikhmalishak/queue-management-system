@@ -53,39 +53,42 @@ const TableComponent = ({ columns, data = [], onEdit, onDelete, onAdd, onImport,
       </div>
 
       {/* 📊 Data Table */}
-      <table className="table table-striped table-hover">
-        <thead className="table-dark">
-          <tr>
-            <th>#</th>
-            {columns.map((col) => (
-              <th key={col.key} onClick={() => handleSort(col.key)} style={{ cursor: "pointer" }}>
-                {col.label} {sortColumn === col.key ? (sortOrder === "asc" ? "🔼" : "🔽") : ""}
-              </th>
-            ))}
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {sortedData.length > 0 ? (
-            sortedData.map((item, index) => (
-              <tr key={item.id}>
-                <td>{index + 1}</td>
-                {columns.map((col) => (
-                  <td key={col.key}>{item[col.key] || "N/A"}</td>
-                ))}
-                <td>
-                  {onEdit && <button className="btn btn-primary btn-sm me-2" onClick={() => onEdit(item)}>✏️ Edit</button>}
-                  {onDelete && <button className="btn btn-danger btn-sm" onClick={() => onDelete(item.id)}>🗑️ Delete</button>}
-                </td>
-              </tr>
-            ))
-          ) : (
+      <div style={{ overflowX: "auto", maxHeight: "500px", overflowY: "auto" }}>
+        <table className="table table-striped table-hover">
+          <thead className="table-dark">
             <tr>
-              <td colSpan={columns.length + 2} className="text-center text-muted">No {title} found</td>
+              <th>#</th>
+              {columns.map((col) => (
+                <th key={col.key} onClick={() => handleSort(col.key)} style={{ cursor: "pointer" }}>
+                  {col.label} {sortColumn === col.key ? (sortOrder === "asc" ? "🔼" : "🔽") : ""}
+                </th>
+              ))}
+              <th>Actions</th>
             </tr>
-          )}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {sortedData.length > 0 ? (
+              sortedData.map((item, index) => (
+                <tr key={item.id}>
+                  <td>{index + 1}</td>
+                  {columns.map((col) => (
+                    <td key={col.key}>{item[col.key] || "N/A"}</td>
+                  ))}
+                  <td>
+                    {onEdit && <button className="btn btn-primary btn-sm me-2" onClick={() => onEdit(item)}>✏️ Edit</button>}
+                    {onDelete && <button className="btn btn-danger btn-sm" onClick={() => onDelete(item.id)}>🗑️ Delete</button>}
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={columns.length + 2} className="text-center text-muted">No {title} found</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
     </div>
   );
 };

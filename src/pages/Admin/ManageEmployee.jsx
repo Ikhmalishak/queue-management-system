@@ -53,9 +53,15 @@ const ManageEmployees = () => {
         { key: "passport_number", label: "Passport Number" },
         { key: "nationatility", label: "Nationality" },
         { key: "base", label: "Base" },
-        { key: "company", label: "Company" },
+        //{ key: "company", label: "Company" },
     ];
 
+    const employeeFields = employeeColumns.map((col) => ({
+        name: col.key, 
+        label: col.label,
+        type: "text", // Default type
+    }));
+    
     // ✅ Open modal for adding a new employee
     const handleAdd = () => {
         setCurrentEmployee(null);
@@ -68,23 +74,59 @@ const ManageEmployees = () => {
         setShowModal(true);
     };
 
-    // ✅ Save new or updated employee
+    const fetchEmployees = async () => {
+        try {
+            const response = await api.get("/employees");
+            setEmployees(response.data);
+        } catch (error) {
+            console.error("❌ Error fetching employees:", error);
+        }
+    };    
+
     const handleSave = async (employee) => {
         try {
-            if (employee.id) {
-                // ✅ Update existing employee
-                await api.put(`/employees/${employee.id}`, employee);
-                setEmployees((prev) => prev.map((emp) => (emp.id === employee.id ? employee : emp)));
+            let updatedEmployee = { ...employee };
+    
+            console.log("Current Employee:", currentEmployee);
+    
+            if (currentEmployee && currentEmployee.employee_id) {
+                // ✅ Ensure the ID is retained
+                updatedEmployee = { ...employee, employee_id: currentEmployee.employee_id };
+    
+                // ✅ Update existing employee (PUT request)
+                await api.put(`/employees/${currentEmployee.id}`, updatedEmployee);
+                setEmployees((prev) =>
+                    prev.map((emp) =>
+                        emp.employee_id === currentEmployee.employee_id ? updatedEmployee : emp
+                    )
+                );
+
+            // ✅ Show success message
+            alert("✅ Employee updated successfully!");
+            
             } else {
-                // ✅ Add new employee
+                // ✅ Add new employee (POST request)
                 const response = await api.post("/employees", employee);
                 setEmployees((prev) => [...prev, response.data]);
             }
+    
             setShowModal(false);
         } catch (error) {
-            console.error("❌ Error saving employee:", error);
+            if (error.response) {
+                // ✅ Handle validation errors from Laravel (422 status)
+                if (error.response.status === 422) {
+                    console.error("❌ Validation Errors:", error.response.data.errors);
+                    alert("Validation Error:\n" + JSON.stringify(error.response.data.errors, null, 2));
+                } else {
+                    console.error("❌ API Error:", error.response.data);
+                    alert("Error: " + error.response.data.message);
+                }
+            } else {
+                console.error("❌ Network or Server Error:", error);
+                alert("An unexpected error occurred. Please try again.");
+            }
         }
-    };
+    };    
 
     // ✅ Delete an employee
     const handleDelete = async (id) => {
@@ -98,11 +140,42 @@ const ManageEmployees = () => {
         }
     };
 
-    // ✅ Dummy Import Function (Implement Later)
-    const handleImport = () => {
-        alert("📂 Import from Excel feature coming soon!");
-    };
-
+    const handleImport = async (event) => {
+        const file = event.target.files[0];
+        if (!file) {
+            alert("No file selected!");
+            return;
+        }
+    
+        const formData = new FormData();
+        formData.append("file", file);
+    
+        console.log("Uploading file:", file.name);
+        
+        try {
+            const response = await api.post("/employees/import", formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+            });
+    
+            console.log("Upload Response:", response);
+            
+            if (response.status === 200 || response.status === 201) {
+                alert("✅ File uploaded successfully!");
+                fetchEmployees(); // Refresh the employee list
+            } else {
+                alert("⚠️ Upload failed: Unexpected response.");
+            }
+        } catch (error) {
+            console.error("❌ Upload Error:", error.response?.data || error);
+            
+            if (error.response) {
+                alert("❌ Upload failed: " + JSON.stringify(error.response.data.errors || error.response.data.message, null, 2));
+            } else {
+                alert("❌ Network error! Please check your connection.");
+            }
+        }
+    };       
+    
     return (
         <div className="d-flex flex-column min-vh-100">
             <Header username="Admin" />
@@ -121,6 +194,7 @@ const ManageEmployees = () => {
                             onAdd={handleAdd}
                             onImport={handleImport}
                         />
+                        
                     )}
                     {showModal && (
                         <FormModal
@@ -128,7 +202,7 @@ const ManageEmployees = () => {
                             onClose={() => setShowModal(false)}
                             onSave={handleSave}
                             title={currentEmployee ? "Edit Employee" : "Add Employee"}
-                            fields={employeeColumns}
+                            fields={employeeFields}
                             initialData={currentEmployee || {}}
                         />
                     )}
