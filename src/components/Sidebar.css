@@ -1,0 +1,68 @@
+.sidebar {
+    height: 100vh;
+    width: 250px;
+    transition: width 0.3s ease-in-out;
+    position: fixed;
+    top: 0;
+    left: 0;
+    overflow-x: hidden;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.collapsed {
+    width: 80px;
+}
+
+.sidebar-header {
+    display: flex;
+    justify-content: center;
+    padding: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.toggle-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+
+.toggle-btn:hover {
+    transform: scale(1.1);
+}
+
+.nav-item {
+    padding: 10px 15px;
+    color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    transition: all 0.3s ease-in-out;
+}
+
+.nav-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.active {
+    background: rgba(255, 255, 255, 0.2);
+    font-weight: bold;
+    color: white;
+}
+
+.icon {
+    font-size: 20px;
+    min-width: 25px;
+    text-align: center;
+}
+
+/* Sidebar.css */
+.nav-item i {
+    font-size: 20px;
+    text-align: center;
+    width: 25px;
+    /* Ensures proper alignment */
+}
