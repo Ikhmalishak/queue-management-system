@@ -14,6 +14,12 @@ const Sidebar = ({ role }) => {
       { name: "Manage Diagnoses", icon: "📈", path: "/admin/diagnoses" },
       // { name: "Reports", icon: "📈", path: "/admin/reports" },
     ],
+    doctor: [
+      { name: "Dashboard", icon: "📊", path: "/admin/dashboard" },
+      { name: "Manage Medicine", icon: "📈", path: "/admin/medicines" },
+      { name: "Manage Diagnoses", icon: "📈", path: "/admin/diagnoses" },
+      // { name: "Reports", icon: "📈", path: "/admin/reports" },
+    ],
   };
 
   return (

@@ -9,8 +9,13 @@ const FormModal = ({ show, onClose, onSave, title, fields, initialData = {} }) =
   }, [initialData, fields]);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+    }));
+};
+
 
   const handleSubmit = () => {
     onSave(formData);
@@ -24,19 +29,36 @@ const FormModal = ({ show, onClose, onSave, title, fields, initialData = {} }) =
       </Modal.Header>
       <Modal.Body>
         <Form>
-        {fields.map((field, index) => (
-    <Form.Group key={field.name || `field-${index}`} className="mb-3">
-        <Form.Label>{field.label}</Form.Label>
-        <Form.Control
-            type={field.type || "text"}
-            name={field.name}
-            defaultValue={formData[field.name]}
-            onChange={handleChange}
-            required={field.required}
-        />
-    </Form.Group>
-))}
+          {fields.map((field, index) => (
+            <Form.Group key={field.name || `field-${index}`} className="mb-3">
+              <Form.Label>{field.label}</Form.Label>
 
+              {/* ✅ Render radio buttons if options exist */}
+              {field.options ? (
+                <div>
+                  {field.options.map((option, idx) => (
+                    <Form.Check
+                      key={idx}
+                      type="radio"
+                      label={option.label}
+                      name={field.name}
+                      value={option.value}
+                      checked={formData[field.name] === option.value}
+                      onChange={handleChange}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <Form.Control
+                  type={field.type || "text"}
+                  name={field.name}
+                  defaultValue={formData[field.name]}
+                  onChange={handleChange}
+                  required={field.required}
+                />
+              )}
+            </Form.Group>
+          ))}
         </Form>
       </Modal.Body>
       <Modal.Footer>

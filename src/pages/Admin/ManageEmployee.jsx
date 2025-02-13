@@ -56,12 +56,48 @@ const ManageEmployees = () => {
         //{ key: "company", label: "Company" },
     ];
 
-    const employeeFields = employeeColumns.map((col) => ({
-        name: col.key, 
-        label: col.label,
-        type: "text", // Default type
-    }));
-    
+    const employeeFields = employeeColumns.map((col) => {
+        const optionsMapping = {
+            department: [
+                { label: "HR", value: "hr" },
+                { label: "Finance", value: "finance" },
+                { label: "Engineering", value: "engineering" },
+            ],
+            race: [
+                { label: "Asian", value: "asian" },
+                { label: "Black", value: "black" },
+                { label: "White", value: "white" },
+                { label: "Mixed", value: "mixed" },
+            ],
+            nationatility: [
+                { label: "Malaysia", value: "Malaysia" },
+                { label: "Myanmar", value: "Myanmar" },
+                { label: "Bangladesh", value: "Bangladesh" },
+            ],
+            base: [
+                { label: "S1", value: "S1" },
+                { label: "S2", value: "S2" },
+                { label: "S3", value: "S3" },
+                { label: "S4", value: "S4" },
+            ]
+        };
+
+        if (optionsMapping[col.key]) {
+            return {
+                name: col.key,
+                label: col.label,
+                options: optionsMapping[col.key], // ✅ Add options for radio buttons
+            };
+        }
+
+        return {
+            name: col.key,
+            label: col.label,
+            type: "text",
+        };
+    });
+
+
     // ✅ Open modal for adding a new employee
     const handleAdd = () => {
         setCurrentEmployee(null);
@@ -86,13 +122,13 @@ const ManageEmployees = () => {
     const handleSave = async (employee) => {
         try {
             let updatedEmployee = { ...employee };
-    
+
             console.log("Current Employee:", currentEmployee);
-    
+
             if (currentEmployee && currentEmployee.employee_id) {
                 // ✅ Ensure the ID is retained
                 updatedEmployee = { ...employee, employee_id: currentEmployee.employee_id };
-    
+
                 // ✅ Update existing employee (PUT request)
                 await api.put(`/employees/${currentEmployee.id}`, updatedEmployee);
                 setEmployees((prev) =>
@@ -101,15 +137,15 @@ const ManageEmployees = () => {
                     )
                 );
 
-            // ✅ Show success message
-            alert("✅ Employee updated successfully!");
-            
+                // ✅ Show success message
+                alert("✅ Employee updated successfully!");
+
             } else {
                 // ✅ Add new employee (POST request)
                 const response = await api.post("/employees", employee);
                 setEmployees((prev) => [...prev, response.data]);
             }
-    
+
             setShowModal(false);
         } catch (error) {
             if (error.response) {
@@ -126,7 +162,7 @@ const ManageEmployees = () => {
                 alert("An unexpected error occurred. Please try again.");
             }
         }
-    };    
+    };
 
     // ✅ Delete an employee
     const handleDelete = async (id) => {
@@ -146,19 +182,19 @@ const ManageEmployees = () => {
             alert("No file selected!");
             return;
         }
-    
+
         const formData = new FormData();
         formData.append("file", file);
-    
+
         console.log("Uploading file:", file.name);
-        
+
         try {
             const response = await api.post("/employees/import", formData, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
-    
+
             console.log("Upload Response:", response);
-            
+
             if (response.status === 200 || response.status === 201) {
                 alert("✅ File uploaded successfully!");
                 fetchEmployees(); // Refresh the employee list
@@ -167,15 +203,15 @@ const ManageEmployees = () => {
             }
         } catch (error) {
             console.error("❌ Upload Error:", error.response?.data || error);
-            
+
             if (error.response) {
                 alert("❌ Upload failed: " + JSON.stringify(error.response.data.errors || error.response.data.message, null, 2));
             } else {
                 alert("❌ Network error! Please check your connection.");
             }
         }
-    };       
-    
+    };
+
     return (
         <div className="d-flex flex-column min-vh-100">
             <Header username="Admin" />
@@ -194,7 +230,6 @@ const ManageEmployees = () => {
                             onAdd={handleAdd}
                             onImport={handleImport}
                         />
-                        
                     )}
                     {showModal && (
                         <FormModal
